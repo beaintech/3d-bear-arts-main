@@ -104,6 +104,8 @@
         leftMaterialSkin.wrapS = leftMaterialSkin.wrapT = THREE.RepeatWrapping;
         leftMaterialSkin.repeat.set(1, 1);
 
+        const rightMaterialSkin = textureLoader.load('/3d-bear-arts/assets/richduck.jpg');
+
         const leftMaterial = new THREE.MeshPhysicalMaterial({
           color: 0xFFFFFF, 
           map: leftMaterialSkin,  // Apply the abstract or halftone texture
@@ -114,19 +116,29 @@
         });
 
         const rightMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0xFFD700,  // Bright yellow color for the head
-            map: leftMaterialSkin,  // Apply a halftone or abstract texture
+            color: 0xFFFFFF,  // Bright yellow color for the head
+            map: rightMaterialSkin,  // Apply a halftone or abstract texture
             metalness: 0.3,  // Slight metalness for a subtle shine
             roughness: 0.5,  // Some roughness to reduce reflections
             transparent: true, // Enable transparency
-            opacity: 0.2,
+            opacity: 0.3,
         });
 
         const circleMap = textureLoader.load('/3d-bear-arts/assets/threeDucks.jpg');
+        const circleMap2 = textureLoader.load('/3d-bear-arts/assets/richduck.jpg');
 
         const transparentCircleMaterial = new THREE.MeshPhysicalMaterial({
             color: 'pink',  // Bright yellow color for the head
             map: circleMap,  // Apply a halftone or abstract texture
+            metalness: 0.3,  // Slight metalness for a subtle shine
+            roughness: 0.5,  // Some roughness to reduce reflections
+            transparent: true,
+            opacity: 1
+        });
+
+        const bodyCircleMaterial = new THREE.MeshPhysicalMaterial({
+            color: 'pink',  // Bright yellow color for the head
+            map: circleMap2,  // Apply a halftone or abstract texture
             metalness: 0.3,  // Slight metalness for a subtle shine
             roughness: 0.5,  // Some roughness to reduce reflections
             transparent: true,
@@ -205,54 +217,6 @@
         depthWrite: true // Disable depth writing to ensure proper rendering
     });
 
-    const vertexShader = `
-      varying vec2 vUv;
-            void main() {
-                vUv = uv;
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-      `;
-  
-        // Fragment shader
-        const fragmentShader = `
-        uniform float time;
-            uniform float opacity; // Add opacity uniform
-            varying vec2 vUv;
-        
-            void main() {
-                // Dynamic water-like gradient effect
-                vec2 p = vUv * 2.0 - vec2(1.0); // Normalize UV coordinates to [-1, 1]
-                float len = length(p); // Get the length of the vector (distance from center)
-                float angle = atan(p.y, p.x); // Calculate the angle in polar coordinates
-        
-                // Create a time-based oscillating value for smooth gradient transitions
-                float wave = sin(len * 10.0 - time * 3.0) * 1.0 + 0.5;
-        
-                // Color gradient based on the angle and distance from the center
-                vec3 color1 = vec3(1.0, 0.3, 0.5); // Pinkish
-                vec3 color2 = vec3(0.3, 0.6, 1.0); // Blueish
-                vec3 color3 = vec3(1.0, 0.0, 0.8); // Magenta
-        
-                // Mix the colors based on wave and angle for a dynamic effect
-                vec3 color = mix(color1, color2, wave);
-                color = mix(color, color3, sin(angle + time) * 0.5 + 0.5);
-        
-                // Set the fragment color with opacity
-                gl_FragColor = vec4(color, opacity); // Use the opacity uniform for transparency
-            }
-      `;
-  
-      const bluePinkHeartMaterial = new THREE.ShaderMaterial({
-        uniforms: {
-            time: { value: 0.0 }, // Time uniform to animate the shader
-            opacity: { value: 1 } // Opacity uniform (set to 0.6 for 60% transparency)
-        },
-        vertexShader,
-        fragmentShader:fragmentShader,
-        transparent: false, // Enable transparency in the material
-        depthWrite: true // Disable depth writing to ensure proper rendering
-    });
-
       // Create a half-sphere geometry
         const bodyGeometry = new THREE.SphereGeometry(
             1,            // Radius
@@ -276,7 +240,7 @@
   
       // Create a circular geometry to fill the flat side
         const circleGeometry = new THREE.CircleGeometry(1, 32); // Radius should match the half-sphere
-        const circle = new THREE.Mesh(circleGeometry, transparentCircleMaterial);
+        const circle = new THREE.Mesh(circleGeometry, bodyCircleMaterial);
         circle.scale.set(0.85, 0.85, 0.8);
   
         // Position the circle to cover the flat side
@@ -441,26 +405,26 @@
         // Load font and create 3D text
         const loader = new FontLoader();
         loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
-        const xEyeGeometry = new TextGeometry('X', {
+        const xEyeGeometry = new TextGeometry('$', {
             font: font,
-            size: 0.18, // Size of the X
-            depth: 0.05,
+            size: 0.25, // Size of the X
+            depth: 0.1,
          });
         
-        const xEye = new THREE.Mesh(xEyeGeometry, pinkSliverHeartMaterial);
+        const xEye = new THREE.Mesh(xEyeGeometry, leftMaterial);
         xEye.position.set(-0.3, .99, 0.53); // Position on the head
         xEye.rotation.x = THREE.MathUtils.degToRad(-5);
         xEye.rotation.y = THREE.MathUtils.degToRad(-15);
         bearGroup.add(xEye);
   
        // Create the O eye
-        const oEyeGeometry = new TextGeometry('+', {
+        const oEyeGeometry = new TextGeometry('$', {
         font: font,
         size: 0.25, // Size of the O
         depth: 0.1, // Thickness of the O
         });
   
-        const oEye = new THREE.Mesh(oEyeGeometry, pinkSliverHeartMaterial);
+        const oEye = new THREE.Mesh(oEyeGeometry, leftMaterial);
         oEye.position.set(0.14, .99, 0.53); // Position on the head
         oEye.rotation.y = THREE.MathUtils.degToRad(12);
         oEye.rotation.x = THREE.MathUtils.degToRad(-5);
@@ -472,30 +436,47 @@
       function createRichDonaldDuck() {
         const duckGroup = new THREE.Group();
 
-        const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff }); // White for the body
+    // Materials
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff }); // White for the body
     const beakMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 }); // Orange for the beak and legs
     const hatMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 }); // Black for the top hat
-    const bowtieMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red for the bowtie
+    const tieMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 }); // Red for the tie
     const caneMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 }); // Brown for the cane
     const pantsMaterial = new THREE.MeshStandardMaterial({ color: 0x0000ff }); // Blue for the pants
+    const glassesMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 }); // Black for the glasses
 
     // Head
     const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
     const head = new THREE.Mesh(headGeometry, bodyMaterial);
-    head.position.set(0, 1.7, 0); // Increased vertical offset for separation
+    head.position.set(0, 1.7, 0);
     duckGroup.add(head);
 
-    // Beak (Flatter and Smaller)
+    // Beak
     const beakGeometry = new THREE.CylinderGeometry(0.15, 0.1, 0.3, 32, 1, true);
     const beakCapGeometry = new THREE.SphereGeometry(0.15, 32, 16, 0, Math.PI);
     const beak = new THREE.Mesh(beakGeometry, beakMaterial);
     const beakCap = new THREE.Mesh(beakCapGeometry, beakMaterial);
 
-    beak.position.set(0, 1.6, 0.45); // Adjusted positioning
+    beak.position.set(0, 1.6, 0.45);
     beak.rotation.x = Math.PI / 2;
     beakCap.position.set(0, 1.6, 0.6);
     duckGroup.add(beak);
     duckGroup.add(beakCap);
+
+    // Glasses
+    const frameGeometry = new THREE.TorusGeometry(0.15, 0.015, 16, 100);
+    const leftFrame = new THREE.Mesh(frameGeometry, glassesMaterial);
+    leftFrame.position.set(-0.3, 1.8, 0.5);
+
+    const rightFrame = new THREE.Mesh(frameGeometry, glassesMaterial);
+    rightFrame.position.set(0.3, 1.8, 0.5);
+
+    const bridgeGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.3, 16);
+    const bridge = new THREE.Mesh(bridgeGeometry, glassesMaterial);
+    bridge.position.set(0, 1.85, 0.5);
+    bridge.rotation.z = Math.PI / 2;
+
+    duckGroup.add(leftFrame, rightFrame, bridge);
 
     // Body
     const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
@@ -504,9 +485,10 @@
     duckGroup.add(body);
 
     // Pants
-    const pantsGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.4, 32);
+    const pantsGeometry = new THREE.SphereGeometry(0.8, 32, 32, 0, Math.PI); // Half-sphere for pants
     const pants = new THREE.Mesh(pantsGeometry, pantsMaterial);
     pants.position.set(0, 0.4, 0);
+    pants.rotation.x = Math.PI / 2;
     duckGroup.add(pants);
 
     // Legs
@@ -539,6 +521,20 @@
     rightFoot.rotation.x = Math.PI / 2;
     duckGroup.add(rightFoot);
 
+    // Tie
+    const tieShape = new THREE.Shape();
+    tieShape.moveTo(0, 0);
+    tieShape.lineTo(-0.15, -0.3);
+    tieShape.lineTo(0, -0.5);
+    tieShape.lineTo(0.15, -0.3);
+    tieShape.closePath();
+
+    const tieGeometry = new THREE.ExtrudeGeometry(tieShape, { depth: 0.05, bevelEnabled: true, bevelSize: 0.01 });
+    const tie = new THREE.Mesh(tieGeometry, tieMaterial);
+    tie.position.set(0, 1.3, 0.45);
+    tie.rotation.x = Math.PI / 8;
+    duckGroup.add(tie);
+
     // Top Hat
     const hatBaseGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 32);
     const hatBase = new THREE.Mesh(hatBaseGeometry, hatMaterial);
@@ -550,12 +546,6 @@
     hatTop.position.set(0, 2.4, 0);
     duckGroup.add(hatTop);
 
-    // Bowtie
-    const bowtieGeometry = new THREE.TorusGeometry(0.2, 0.05, 16, 100);
-    const bowtie = new THREE.Mesh(bowtieGeometry, bowtieMaterial);
-    bowtie.position.set(0, 1.2, 0.5);
-    duckGroup.add(bowtie);
-
     // Cane
     const caneGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 32);
     const cane = new THREE.Mesh(caneGeometry, caneMaterial);
@@ -564,13 +554,11 @@
     duckGroup.add(cane);
 
     return duckGroup;
-
-        return duckGroup;
-        }
+    }
 
       const richDonaldDuck = createRichDonaldDuck();
-      richDonaldDuck.scale.set(0.3, 0.3, 0.3);
-      richDonaldDuck.position.set(0.2, 0, 0);
+      richDonaldDuck.scale.set(0.25, 0.25, 0.25);
+      richDonaldDuck.position.set(0.3, -0.3, 0);
 
       bearGroup.add(richDonaldDuck);
   
@@ -688,7 +676,6 @@
         
        function animate() {
           requestAnimationFrame(animate);
-          bluePinkHeartMaterial.uniforms.time.value += 0.05;
           pinkSliverHeartMaterial.uniforms.time.value += 0.05;
 
           if (isRotatingRight.value) bearGroup.rotation.y += 0.05;
@@ -774,46 +761,19 @@
     </script>
     
     <style scoped>
-      .three-canvas {
-        width: 100vw;
-        height: 100vh;
-        overflow: hidden;
-        /* background: radial-gradient(circle at 50% 50%, #FF69B4, #4C99FF, #FF00CC, #000000); */
-        background: radial-gradient(circle at 50% 50%, #ffffff, #70ebeb, #f097de, #efef9f);
-        background: radial-gradient(circle at 50% 50%, 
-        rgba(255, 105, 180, 0.8), 
-        rgba(76, 153, 255, 0.5), 
-        rgba(255, 0, 204, 0.8), 
-        rgba(0, 0, 0, 0.6));
-        background-size: 100% 100%;
-        background-repeat: no-repeat;
-        animation: waterEffect 5s infinite ease-in-out;
-      }
+.three-canvas {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 50%, 
+        rgba(255, 215, 0, 0.8),   /* Gold */
+        rgba(34, 139, 34, 0.6),  /* Forest Green */
+        rgba(218, 165, 32, 0.8), /* Goldenrod */
+        rgba(0, 0, 0, 0.7));     /* Dark for contrast */
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
 
-      /* background: radial-gradient(circle at 50% 50%, #ffffff, #70ebeb, #f097de, #efef9f); */
-      
-      @keyframes waterEffect {
-        0% {
-          background-size: 100% 100%;
-          background-position: 0% 50%;
-        }
-        25% {
-          background-size: 150% 150%;
-          background-position: 50% 100%;
-        }
-        50% {
-          background-size: 200% 200%;
-          background-position: 100% 50%;
-        }
-        75% {
-          background-size: 150% 150%;
-          background-position: 50% 0%;
-        }
-        100% {
-          background-size: 100% 100%;
-          background-position: 0% 50%;
-        }
-      }
   
     .no-bg {
             margin: 0;
