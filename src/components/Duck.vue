@@ -90,12 +90,12 @@
         const mirrorLoader = new THREE.CubeTextureLoader();
         
         const environmentMap = mirrorLoader.load([
-          '/3d-bear-arts/assets/richduck.jpg',
-          '/3d-bear-arts/assets/richduck.jpg',
-          '/3d-bear-arts/assets/richduck.jpg',
-          '/3d-bear-arts/assets/richduck.jpg',
-          '/3d-bear-arts/assets/richduck.jpg',
-          '/3d-bear-arts/assets/richduck.jpg'
+          '/3d-bear-arts/assets/threeDucks.jpg',
+          '/3d-bear-arts/assets/threeDucks.jpg',
+          '/3d-bear-arts/assets/threeDucks.jpg',
+          '/3d-bear-arts/assets/threeDucks.jpg',
+          '/3d-bear-arts/assets/threeDucks.jpg',
+          '/3d-bear-arts/assets/threeDucks.jpg'
         ]);
         
         scene.environment = environmentMap;
@@ -121,7 +121,41 @@
             metalness: 0.3,  // Slight metalness for a subtle shine
             roughness: 0.5,  // Some roughness to reduce reflections
             transparent: true, // Enable transparency
-            opacity: 0.3,
+            opacity: 0.2,
+        });
+
+        // const leftMaterial = new THREE.MeshPhysicalMaterial({
+        //   color: 'white', 
+        //   // map: leftMaterialSkin,  // Apply the abstract or halftone texture
+        //   metalness: 1.0,  // Full metalness for maximum reflectivity
+        //   roughness: 0.05, // Low roughness for sharper reflections
+        //   clearcoat: 1.0,  // High clearcoat for added shine
+        //   clearcoatRoughness: 0.05, // Low clearcoat roughness for more shine
+        //   envMap: environmentMap, // Link the environment map
+        //   reflectivity: 1, // Maximum reflectivity
+        // });
+
+        // const rightMaterial = new THREE.MeshPhysicalMaterial({
+        //   color: 'white', 
+        //   map: rightMaterialSkin,  // Apply a halftone or abstract texture
+        //   transparent: true, // Enable transparency
+        //   opacity: 0.3,
+        //   metalness: 1.0,  // Full metalness for maximum reflectivity
+        //   roughness: 0.05, // Low roughness for sharper reflections
+        //   clearcoat: 1.0,  // High clearcoat for added shine
+        //   clearcoatRoughness: 0.05, // Low clearcoat roughness for more shine
+        //   envMap: environmentMap, // Link the environment map
+        //   reflectivity: 1, // Maximum reflectivity
+        // });
+
+        const eyeMaterial = new THREE.MeshPhysicalMaterial({
+          color: 'white', // Silver color
+          metalness: 1.0,  // Full metalness for maximum reflectivity
+          roughness: 0.05, // Low roughness for sharper reflections
+          clearcoat: 1.0,  // High clearcoat for added shine
+          clearcoatRoughness: 0.05, // Low clearcoat roughness for more shine
+          envMap: environmentMap, // Link the environment map
+          reflectivity: 1, // Maximum reflectivity
         });
 
         const circleMap = textureLoader.load('/3d-bear-arts/assets/threeDucks.jpg');
@@ -407,11 +441,11 @@
         loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', function (font) {
         const xEyeGeometry = new TextGeometry('$', {
             font: font,
-            size: 0.25, // Size of the X
+            size: 0.2, // Size of the X
             depth: 0.1,
          });
         
-        const xEye = new THREE.Mesh(xEyeGeometry, leftMaterial);
+        const xEye = new THREE.Mesh(xEyeGeometry, eyeMaterial);
         xEye.position.set(-0.3, .99, 0.53); // Position on the head
         xEye.rotation.x = THREE.MathUtils.degToRad(-5);
         xEye.rotation.y = THREE.MathUtils.degToRad(-15);
@@ -420,11 +454,11 @@
        // Create the O eye
         const oEyeGeometry = new TextGeometry('$', {
         font: font,
-        size: 0.25, // Size of the O
+        size: 0.2, // Size of the O
         depth: 0.1, // Thickness of the O
         });
   
-        const oEye = new THREE.Mesh(oEyeGeometry, leftMaterial);
+        const oEye = new THREE.Mesh(oEyeGeometry, eyeMaterial);
         oEye.position.set(0.14, .99, 0.53); // Position on the head
         oEye.rotation.y = THREE.MathUtils.degToRad(12);
         oEye.rotation.x = THREE.MathUtils.degToRad(-5);
@@ -466,12 +500,12 @@
     // Glasses
     const frameGeometry = new THREE.TorusGeometry(0.15, 0.015, 16, 100);
     const leftFrame = new THREE.Mesh(frameGeometry, glassesMaterial);
-    leftFrame.position.set(-0.3, 1.8, 0.5);
+    leftFrame.position.set(-0.25, 1.8, 0.5);
 
     const rightFrame = new THREE.Mesh(frameGeometry, glassesMaterial);
-    rightFrame.position.set(0.3, 1.8, 0.5);
+    rightFrame.position.set(0.25, 1.8, 0.5);
 
-    const bridgeGeometry = new THREE.CylinderGeometry(0.02, 0.02, 0.3, 16);
+    const bridgeGeometry = new THREE.CylinderGeometry(0.01, 0.01, 0.3, 16);
     const bridge = new THREE.Mesh(bridgeGeometry, glassesMaterial);
     bridge.position.set(0, 1.85, 0.5);
     bridge.rotation.z = Math.PI / 2;
@@ -479,26 +513,26 @@
     duckGroup.add(leftFrame, rightFrame, bridge);
 
     // Body
-    const bodyGeometry = new THREE.SphereGeometry(0.8, 32, 32);
+    const bodyGeometry = new THREE.SphereGeometry(0.6, 32, 32);
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-    body.position.set(0, 0.6, 0);
+    body.position.set(0, 0.7, 0);
     duckGroup.add(body);
 
     // Pants
-    const pantsGeometry = new THREE.SphereGeometry(0.8, 32, 32, 0, Math.PI); // Half-sphere for pants
+    const pantsGeometry = new THREE.SphereGeometry(0.6, 32, 32, 0, Math.PI); // Half-sphere for pants
     const pants = new THREE.Mesh(pantsGeometry, pantsMaterial);
-    pants.position.set(0, 0.4, 0);
+    pants.position.set(0, 0.6, 0);
     pants.rotation.x = Math.PI / 2;
     duckGroup.add(pants);
 
     // Legs
     const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 32);
     const leftLeg = new THREE.Mesh(legGeometry, beakMaterial);
-    leftLeg.position.set(-0.3, -0.4, 0);
+    leftLeg.position.set(-0.3, -0.1, 0);
     duckGroup.add(leftLeg);
 
     const rightLeg = new THREE.Mesh(legGeometry, beakMaterial);
-    rightLeg.position.set(0.3, -0.4, 0);
+    rightLeg.position.set(0.3, -0.1, 0);
     duckGroup.add(rightLeg);
 
     // Feet
@@ -512,12 +546,12 @@
 
     const footGeometry = new THREE.ExtrudeGeometry(footShape, { depth: 0.1, bevelEnabled: false });
     const leftFoot = new THREE.Mesh(footGeometry, beakMaterial);
-    leftFoot.position.set(-0.3, -0.7, 0.1);
+    leftFoot.position.set(-0.3, -0.3, 0.1);
     leftFoot.rotation.x = Math.PI / 2;
     duckGroup.add(leftFoot);
 
     const rightFoot = new THREE.Mesh(footGeometry, beakMaterial);
-    rightFoot.position.set(0.3, -0.7, 0.1);
+    rightFoot.position.set(0.3, -0.3, 0.1);
     rightFoot.rotation.x = Math.PI / 2;
     duckGroup.add(rightFoot);
 
@@ -547,9 +581,9 @@
     duckGroup.add(hatTop);
 
     // Cane
-    const caneGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2, 32);
+    const caneGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5, 16);
     const cane = new THREE.Mesh(caneGeometry, caneMaterial);
-    cane.position.set(0.5, 0, 0);
+    cane.position.set(0.85, 0.5, 0);
     cane.rotation.z = Math.PI / 8;
     duckGroup.add(cane);
 
@@ -561,7 +595,106 @@
       richDonaldDuck.position.set(0.3, -0.3, 0);
 
       bearGroup.add(richDonaldDuck);
-  
+
+  function createSmallDuck(pantsColor: any, hatColor: any) {
+    const duckGroup = new THREE.Group();
+
+    // Materials
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff }); // White for the body
+    const beakMaterial = new THREE.MeshStandardMaterial({ color: 0xffa500 }); // Orange for the beak and legs
+    const pantsMaterial = new THREE.MeshStandardMaterial({ color: pantsColor }); // Custom color for the pants
+    const hatMaterial = new THREE.MeshStandardMaterial({ color: hatColor });
+
+    // Head
+    const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+    const head = new THREE.Mesh(headGeometry, bodyMaterial);
+    head.position.set(0, 1.7, 0);
+    duckGroup.add(head);
+
+    // Beak
+    const beakGeometry = new THREE.CylinderGeometry(0.15, 0.1, 0.3, 32, 1, true);
+    const beakCapGeometry = new THREE.SphereGeometry(0.15, 32, 16, 0, Math.PI);
+    const beak = new THREE.Mesh(beakGeometry, beakMaterial);
+    const beakCap = new THREE.Mesh(beakCapGeometry, beakMaterial);
+
+    beak.position.set(0, 1.6, 0.45);
+    beak.rotation.x = Math.PI / 2;
+    beakCap.position.set(0, 1.6, 0.6);
+    duckGroup.add(beak);
+    duckGroup.add(beakCap);
+
+    // Body
+    const bodyGeometry = new THREE.SphereGeometry(0.6, 32, 32);
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.position.set(0, 0.7, 0);
+    duckGroup.add(body);
+
+    // Pants
+    const pantsGeometry = new THREE.SphereGeometry(0.6, 32, 32, 0, Math.PI); // Half-sphere for pants
+    const pants = new THREE.Mesh(pantsGeometry, pantsMaterial);
+    pants.position.set(0, 0.6, 0);
+    pants.rotation.x = Math.PI / 2;
+    duckGroup.add(pants);
+
+    // Legs
+    const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.5, 32);
+    const leftLeg = new THREE.Mesh(legGeometry, beakMaterial);
+    leftLeg.position.set(-0.3, -0.1, 0);
+    duckGroup.add(leftLeg);
+
+    const rightLeg = new THREE.Mesh(legGeometry, beakMaterial);
+    rightLeg.position.set(0.3, -0.1, 0);
+    duckGroup.add(rightLeg);
+
+    // Feet
+    const footShape = new THREE.Shape();
+    footShape.moveTo(0, 0);
+    footShape.lineTo(0.3, 0.1);
+    footShape.lineTo(0.15, -0.1);
+    footShape.lineTo(-0.15, -0.1);
+    footShape.lineTo(-0.3, 0.1);
+    footShape.closePath();
+
+    const footGeometry = new THREE.ExtrudeGeometry(footShape, { depth: 0.1, bevelEnabled: false });
+    const leftFoot = new THREE.Mesh(footGeometry, beakMaterial);
+    leftFoot.position.set(-0.3, -0.3, 0.1);
+    leftFoot.rotation.x = Math.PI / 2;
+    duckGroup.add(leftFoot);
+
+    const rightFoot = new THREE.Mesh(footGeometry, beakMaterial);
+    rightFoot.position.set(0.3, -0.3, 0.1);
+    rightFoot.rotation.x = Math.PI / 2;
+    duckGroup.add(rightFoot);
+
+    // Baseball Hat
+    const hatBaseGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.1, 32);
+    const hatBase = new THREE.Mesh(hatBaseGeometry, hatMaterial);
+    hatBase.position.set(0, 2.1, 0);
+    duckGroup.add(hatBase);
+
+    const hatTopGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.3, 32);
+    const hatTop = new THREE.Mesh(hatTopGeometry, hatMaterial);
+    hatTop.position.set(0, 2.4, 0);
+    duckGroup.add(hatTop);
+
+    return duckGroup;
+}
+
+const redDuck = createSmallDuck(0xff0000, 0xff0000); // Red pants and red hat
+redDuck.scale.set(0.15, 0.15, 0.15);
+redDuck.position.set(0.3, 0.6, 0.15);
+bearGroup.add(redDuck);
+
+const greenDuck = createSmallDuck(0x00ff00, 0x00ff00); // Green pants and green hat
+greenDuck.scale.set(0.15, 0.15, 0.15);
+greenDuck.position.set(0.2, -0.5, 0.4);
+bearGroup.add(greenDuck);
+
+const blueDuck = createSmallDuck(0x0000ff, 0x0000ff); // Blue pants and blue hat
+blueDuck.scale.set(0.15, 0.15, 0.15);
+blueDuck.position.set(0.5, -0.5, 0.35);
+bearGroup.add(blueDuck);
+
       // Add bear group to the scene
       bearGroup.scale.set(1.4, 1.4, 1.4);
       scene.add(bearGroup);
@@ -578,7 +711,7 @@
       let timeoutId: any = null;  // To track the timeout when resuming the animation
       let currentRotationY = 0;   // Current rotation for Y-axis
       let currentRotationX = 0;   // Current rotation for X-axis
-      // let isRotatingRight = ref(false); // Is rotating to right
+      // let isRotatingody = ref(false); // Is rotating to right
       // let isRotatingLeft = ref(false);  // Is rotating to left
       let shouldFaceMouse = ref(false); // Should bear face the mouse?
 
@@ -766,9 +899,9 @@
     height: 100vh;
     overflow: hidden;
     background: radial-gradient(circle at 50% 50%, 
-        rgba(255, 215, 0, 0.8),   /* Gold */
-        rgba(34, 139, 34, 0.6),  /* Forest Green */
-        rgba(218, 165, 32, 0.8), /* Goldenrod */
+        rgba(255, 215, 0, 0.98),   /* Gold */
+        rgba(34, 139, 34, 0.96),  /* Forest Green */
+        rgba(218, 165, 32, 0.98), /* Goldenrod */
         rgba(0, 0, 0, 0.7));     /* Dark for contrast */
     background-size: 100% 100%;
     background-repeat: no-repeat;
